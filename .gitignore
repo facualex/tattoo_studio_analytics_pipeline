@@ -1,0 +1,5 @@
+data/
+ingest/.venv/
+
+.DS_Store
+.env
