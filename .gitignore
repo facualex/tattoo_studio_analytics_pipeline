@@ -2,6 +2,11 @@ data/
 credentials/
 ingest/.venv/
 ingest/logs/
+infra/.terraform/
+infra/terraform.tfvars
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/crash.log
 **/__pycache__/
 
 .DS_Store
