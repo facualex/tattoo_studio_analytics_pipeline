@@ -9,5 +9,17 @@ infra/*.tfstate.backup
 infra/crash.log
 **/__pycache__/
 
+# dbt: local venv, DuckDB dev database, and run artifacts. profiles.yml
+# is kept out of git preemptively — the commented-out Athena target above
+# is where AWS connection details would eventually go.
+dbt/.venv/
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/*.duckdb
+dbt/*.duckdb.wal
+dbt/profiles.yml
+dbt/.user.yml
+
 .DS_Store
 .env

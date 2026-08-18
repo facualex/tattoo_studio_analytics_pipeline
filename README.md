@@ -131,4 +131,4 @@ This project deliberately optimizes for near-zero operating cost while still dem
 
 ## Author
 
-Built by [Facundo] — Data Engineer transitioning from legacy ETL tooling (NiFi, PowerCenter) toward cloud-native data engineering. This project was built as a real solution for a real client, and doubles as a portfolio piece demonstrating the dbt → Airflow → AWS stack end-to-end.
+Built by [Facundo] — Data Engineer transitioning from legacy ETL tools toward cloud-native data engineering. This project was built as a real solution for a real client, and doubles as a portfolio piece demonstrating the dbt → Airflow → AWS stack end-to-end.

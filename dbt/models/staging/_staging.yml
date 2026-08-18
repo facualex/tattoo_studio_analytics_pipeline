@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_tatuajes
+    description: One row per tattoo session, cast and lightly renamed from the raw Sheets extract.
+    columns:
+      - name: client_name
+        tests: [not_null]
+      - name: tattoo_date
+      - name: price_clp
+
+  - name: stg_arte
+    description: One row per fine-art piece sold.
+
+  - name: stg_maquillaje
+    description: One row per makeup booking.
+
+  - name: stg_gastos
+    description: One row per business expense.
+
+  - name: stg_retiros
+    description: One row per owner withdrawal.

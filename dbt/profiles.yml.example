@@ -1,0 +1,24 @@
+tattoo_studio_analytics:
+  target: dev
+  outputs:
+    # Local-only dev target: builds against DuckDB on disk, reading the
+    # Parquet files that sheets_extractor.py writes to ingest/data/tmp/.
+    # No AWS calls, no cost, fast iteration for staging/marts modeling.
+    dev:
+      type: duckdb
+      path: "dev.duckdb"
+      threads: 4
+
+    # Placeholder for once the Athena/S3 legs of the infra are applied
+    # (see infra/main.tf) and staging/marts models are stable enough to
+    # validate against the real workgroup. Requires the dbt-athena-community
+    # adapter (not installed by default — add to requirements.txt when
+    # you're ready to use this target).
+    # prod:
+    #   type: athena
+    #   s3_staging_dir: "s3://<bucket_name>/athena-results/"
+    #   s3_data_dir: "s3://<bucket_name>/marts/"
+    #   region_name: us-east-1
+    #   database: tattoo_studio_analytics
+    #   schema: marts
+    #   work_group: tattoo-studio-analytics-workgroup

@@ -30,6 +30,7 @@ load_dotenv()
 
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH")
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
+LOG_RETENTION_DAYS = int(os.getenv("SHEETS_LOG_RETENTION_DAYS", "14"))
 
 # Minimum scopes required: read Sheets and read Drive metadata
 # (gspread uses Drive to resolve the spreadsheet by ID).
@@ -78,6 +79,34 @@ logger.addHandler(_file_handler)
 # ---------------------------------------------------------------------------
 # Internal utilities
 # ---------------------------------------------------------------------------
+
+
+def _purge_old_logs(retention_days: int) -> None:
+    """
+    Deletes log files in LOGS_DIR older than retention_days.
+
+    Called from extract_all_sheets() so retention is enforced on every
+    real extraction run, regardless of what triggers the script (Airflow,
+    cron, or a manual invocation) rather than depending on the
+    orchestrator to also own log cleanup.
+
+    Args:
+        retention_days: log files whose modification time is older than
+            this many days are deleted.
+    """
+    cutoff_timestamp = datetime.now().timestamp() - retention_days * 86400
+
+    for log_file in LOGS_DIR.glob("sheets_extractor_*.log"):
+        try:
+            if log_file.stat().st_mtime < cutoff_timestamp:
+                log_file.unlink()
+                logger.info(
+                    "Purged old log file '%s' (older than %d days)",
+                    log_file.name,
+                    retention_days,
+                )
+        except OSError as exc:
+            logger.warning("Failed to purge log file '%s': %s", log_file.name, exc)
 
 
 def _normalize_sheet_name(sheet_name: str) -> str:
@@ -192,6 +221,7 @@ def extract_all_sheets(sheet_configs: list[dict]) -> dict:
             {"successful": list[str], "failed": list[str], "total": int}.
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    _purge_old_logs(LOG_RETENTION_DAYS)
 
     successful: list[str] = []
     failed: list[str] = []
