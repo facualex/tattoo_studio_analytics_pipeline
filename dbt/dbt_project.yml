@@ -24,5 +24,7 @@ models:
   tattoo_studio_analytics:
     staging:
       +materialized: view
+    intermediate:
+      +materialized: view
     marts:
       +materialized: table

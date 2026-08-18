@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: int_sales_unioned
+    description: >
+      All revenue-generating transactions (tattoo, art, makeup) unioned
+      into one grain with a business_line discriminator. Feeds any mart
+      that needs the full client transaction history (revenue, client
+      loyalty/churn, acquisition channel performance).
+    columns:
+      - name: business_line
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["tattoo", "art", "makeup"]
+      - name: client_name
+        tests: [not_null]
+
+  - name: int_cashflow_unioned
+    description: >
+      All cash outflows (business expenses, owner withdrawals) unioned
+      into one grain with a cashflow_type discriminator. Feeds a
+      margin/P&L mart alongside int_sales_unioned.
+    columns:
+      - name: cashflow_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["expense", "withdrawal"]
