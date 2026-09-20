@@ -4,14 +4,19 @@
 -- description/style/location/payment_method stay inline as degenerate
 -- dimensions since none of them warrant their own dimension table yet.
 --
--- is_zero_price surfaces the ~40% of rows recorded at $0 (mostly missing
+-- is_zero_price surfaces the ~37% of rows recorded at $0 (mostly missing
 -- price input, a smaller share genuine trades — see the data quality
 -- card) so consumers can filter them out of revenue/ticket metrics with
 -- one flag instead of remembering to check price_clp = 0.
 --
--- transaction_date is null on 10 rows (real revenue, missing date input
--- in Sheets) — see the not_null test on this column in _marts.yml for
--- why it's a warning, not a build failure.
+-- client_name is 'unknown' for a few rows with real revenue but no
+-- recoverable client identity (see stg_arte/stg_maquillaje) — kept here
+-- for revenue totals, but excluded from dim_cliente/client-level
+-- reporting (see int_segmentacion_clientes).
+--
+-- transaction_date is null on a handful of rows (real revenue, missing
+-- date input in Sheets) — see the not_null test on this column in
+-- _marts.yml for why it's a warning, not a build failure.
 
 select
     business_line,

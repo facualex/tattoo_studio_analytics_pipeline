@@ -10,10 +10,21 @@ models:
       - name: price_clp
 
   - name: stg_arte
-    description: One row per fine-art piece sold.
+    description: >
+      One row per fine-art piece sold. Drops the sheet's calendar-month
+      scaffold rows (see the is_calendar_month_name macro); real sales
+      with an unusable client name are kept under client_name = 'unknown'
+      rather than dropped.
+    columns:
+      - name: client_name
+        tests: [not_null]
 
   - name: stg_maquillaje
-    description: One row per makeup booking.
+    description: >
+      One row per makeup booking. Same scaffold-row handling as stg_arte.
+    columns:
+      - name: client_name
+        tests: [not_null]
 
   - name: stg_gastos
     description: One row per business expense.

@@ -27,6 +27,14 @@ models:
         tests:
           - not_null
           - relationships:
+              config:
+                where: "client_name != 'unknown'"
+                description: >
+                  'unknown' is a deliberate exception, not a data gap:
+                  int_segmentacion_clientes excludes it on purpose (see
+                  that model) so unrelated anonymous sales don't get
+                  aggregated into one fake client. Every other
+                  client_name must resolve to a real dim_cliente row.
               arguments:
                 to: ref('dim_cliente')
                 field: client_name
@@ -36,11 +44,12 @@ models:
               config:
                 severity: warn
                 description: >
-                  10 rows have real revenue (client, price, description)
-                  but no parseable date in Sheets — a genuine gap in the
-                  source data, not something to fabricate a date for.
-                  Warn instead of error so the build stays green while
-                  this is tracked on the data-quality card.
+                  A handful of rows have real revenue (client, price,
+                  description) but no parseable date in Sheets — a
+                  genuine gap in the source data, not something to
+                  fabricate a date for. Warn instead of error so the
+                  build stays green while this is tracked on the
+                  data-quality card.
           - relationships:
               arguments:
                 to: ref('dim_fecha')

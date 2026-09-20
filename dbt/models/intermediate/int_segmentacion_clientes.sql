@@ -2,6 +2,12 @@
 -- across the three sheets, see the data-quality card), aggregated across
 -- all three business lines via int_sales_unioned. Feeds dim_cliente.
 --
+-- Excludes client_name = 'unknown': those rows are real revenue with no
+-- recoverable client identity (see stg_arte/stg_maquillaje), and
+-- aggregating them together would fabricate a single high-visit "client"
+-- out of several unrelated anonymous sales. They stay in fct_sesiones
+-- (revenue-level reporting), just not here (client-level reporting).
+--
 -- Thresholds below aren't round-number guesses: they're read off the
 -- actual gap-between-visits distribution for repeat tattoo clients in
 -- this dataset (median ~28 days, p75 ~140 days, p90 ~359 days). Rounding
@@ -19,6 +25,7 @@ with client_activity as (
         min(transaction_date)                                as first_transaction_date,
         max(transaction_date)                                as last_transaction_date
     from {{ ref('int_sales_unioned') }}
+    where client_name != 'unknown'
     group by client_name
 )
 
