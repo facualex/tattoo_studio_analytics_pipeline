@@ -21,5 +21,7 @@ dbt/*.duckdb.wal
 dbt/profiles.yml
 dbt/.user.yml
 
+dashboard/.venv/
+
 .DS_Store
 .env

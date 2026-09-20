@@ -1,0 +1,10 @@
+# Aligns Streamlit's own chrome (multiselect chips, active-tab highlight,
+# buttons) with the dataviz palette's categorical blue, so the default
+# accent (a red) doesn't visually compete with the red used for the
+# "lapsed/critical" client status elsewhere on the page.
+[theme]
+primaryColor = "#2a78d6"
+backgroundColor = "#f9f9f7"
+secondaryBackgroundColor = "#fcfcfb"
+textColor = "#0b0b0b"
+font = "sans serif"
