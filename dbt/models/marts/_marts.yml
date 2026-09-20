@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: dim_cliente
+    description: One row per client, with loyalty (visit_tier) and churn-risk (recency_status) segmentation. See int_segmentacion_clientes for the derivation.
+    columns:
+      - name: client_name
+        tests: [not_null, unique]
+
+  - name: dim_fecha
+    description: Calendar date spine covering every fact date plus a year of runway. See the model for how the range is computed.
+    columns:
+      - name: date_day
+        tests: [not_null, unique]
+
+  - name: fct_sesiones
+    description: One row per revenue-generating transaction (tattoo session, art sale, makeup booking). See the model for the is_zero_price note.
+    columns:
+      - name: business_line
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_negocio')
+                field: business_key
+      - name: client_name
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_cliente')
+                field: client_name
+      - name: transaction_date
+        tests:
+          - not_null:
+              config:
+                severity: warn
+                description: >
+                  10 rows have real revenue (client, price, description)
+                  but no parseable date in Sheets — a genuine gap in the
+                  source data, not something to fabricate a date for.
+                  Warn instead of error so the build stays green while
+                  this is tracked on the data-quality card.
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: date_day
+
+  - name: fct_gastos
+    description: One row per business expense.
+    columns:
+      - name: business_line
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_negocio')
+                field: business_key
+      - name: transaction_date
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: date_day
+
+  - name: fct_retiros
+    description: One row per owner withdrawal — kept separate from fct_gastos so withdrawals never get counted as a business expense.
+    columns:
+      - name: business_line
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_negocio')
+                field: business_key
+      - name: transaction_date
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: date_day

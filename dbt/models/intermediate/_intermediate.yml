@@ -27,3 +27,35 @@ models:
           - accepted_values:
               arguments:
                 values: ["expense", "withdrawal"]
+      - name: business_line
+        description: >
+          "Negocio" (as entered in Sheets, e.g. "Tatuajes") normalized to
+          the same tattoo/art/makeup keys int_sales_unioned hardcodes for
+          business_line, so both fact families can join to one
+          dim_negocio.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["tattoo", "art", "makeup"]
+
+  - name: int_segmentacion_clientes
+    description: >
+      One row per client (by client_name), aggregated across all three
+      business lines from int_sales_unioned: visit counts, revenue,
+      average ticket (excluding $0 records), and two independent
+      segmentation dimensions — visit_tier (loyalty, by visit count) and
+      recency_status (churn risk, by days since last transaction). Feeds
+      dim_cliente.
+    columns:
+      - name: client_name
+        tests: [not_null, unique]
+      - name: visit_tier
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["new", "returning", "loyal"]
+      - name: recency_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["active", "at_risk", "lapsed"]

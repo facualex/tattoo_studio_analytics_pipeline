@@ -1,0 +1,8 @@
+version: 2
+
+seeds:
+  - name: dim_negocio
+    description: Static lookup of the three business lines. Small and fixed enough to seed rather than derive from a source.
+    columns:
+      - name: business_key
+        tests: [not_null, unique]
