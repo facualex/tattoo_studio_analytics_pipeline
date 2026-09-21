@@ -100,3 +100,56 @@ else:
         yaxis=dict(showgrid=True, gridcolor=GRIDLINE, tickfont=dict(color=INK_MUTED), tickprefix="$"),
     )
     st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+
+# --- Revenue by style ----------------------------------------------------
+st.subheader("Ingresos por estilo")
+
+styled = sesiones[sesiones["style"].notna() & (sesiones["style"].str.strip() != "")]
+missing_style_pct = 1 - (len(styled) / len(sesiones)) if len(sesiones) else 0
+st.caption(
+    f"{missing_style_pct:.0%} de las sesiones no tienen estilo registrado y no entran en este gráfico. "
+    "Nombres de estilo tal como están cargados — variantes como “Linea fina”/“Fineline” "
+    "todavía no están unificadas (ver tarjeta de calidad de datos)."
+)
+
+if styled.empty:
+    st.info("No hay sesiones con estilo registrado.")
+else:
+    by_style = styled.groupby("style", as_index=False)["price_clp"].sum().sort_values("price_clp", ascending=False)
+
+    TOP_N = 7
+    top_styles = by_style.head(TOP_N).copy()
+    other_total = by_style["price_clp"].iloc[TOP_N:].sum()
+    # A single hue: each bar already carries its own identity via the axis
+    # label, so color isn't doing identity work here — "Otros" gets a
+    # muted, visibly different tone to mark it as a residual bucket, not
+    # a style in its own right.
+    top_styles["color"] = "#2a78d6"
+    if other_total > 0:
+        top_styles = pd.concat(
+            [top_styles, pd.DataFrame([{"style": "Otros", "price_clp": other_total, "color": INK_MUTED}])]
+        )
+    top_styles = top_styles.sort_values("price_clp")
+
+    fig = go.Figure(
+        data=go.Bar(
+            x=top_styles["price_clp"],
+            y=top_styles["style"],
+            orientation="h",
+            marker_color=top_styles["color"],
+            hovertemplate="%{y}: $%{x:,.0f}<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        plot_bgcolor=CHART_SURFACE,
+        paper_bgcolor=CHART_SURFACE,
+        font_color=INK_PRIMARY,
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=340,
+        xaxis=dict(showgrid=True, gridcolor=GRIDLINE, tickprefix="$", tickfont=dict(color=INK_MUTED)),
+        yaxis=dict(showgrid=False),
+        showlegend=False,
+    )
+    st.plotly_chart(fig, use_container_width=True)
