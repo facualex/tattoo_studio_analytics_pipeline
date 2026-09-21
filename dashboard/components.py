@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from data import STATUS_COLORS, STATUS_ICONS, STATUS_LABELS_ES, load_data_health
+from data import MIN_EXPENSE_ROWS_FOR_REPORTING, STATUS_COLORS, STATUS_ICONS, STATUS_LABELS_ES, load_data_health
 
 # Chart chrome tokens (light mode) — see the dataviz skill's palette.md.
 PAGE_PLANE = "#f9f9f7"
@@ -51,11 +51,11 @@ def render_data_health_banner() -> None:
             f"{health['null_date_rows']} sesiones con ingreso real no tienen fecha registrada "
             "y no aparecen en las vistas por período."
         )
-    if health["gastos_rows"] + health["retiros_rows"] < 20:
+    if not health["expense_data_ready"]:
         warnings.append(
             f"Solo hay {health['gastos_rows']} gastos y {health['retiros_rows']} retiros "
-            "cargados — el registro de gastos recién está empezando, así que todavía no se "
-            "muestra un margen: hoy sería un número engañosamente alto."
+            f"cargados (se necesitan {MIN_EXPENSE_ROWS_FOR_REPORTING} en total) — la página "
+            "Finanzas todavía no muestra el margen: hoy sería un número engañosamente alto."
         )
 
     with st.container(border=True):

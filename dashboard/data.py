@@ -35,6 +35,12 @@ STATUS_ICONS = {"active": "\U0001f7e2", "at_risk": "\U0001f7e0", "lapsed": "\U00
 
 VISIT_TIER_LABELS_ES = {"new": "Nuevo", "returning": "Recurrente", "loyal": "Leal"}
 
+# Below this many combined gastos+retiros rows, expense data is too sparse to
+# report on honestly (see the data-health banner and the Finanzas page — both
+# read this same flag so there's one place that decides "is it ready", not
+# two thresholds that can drift apart).
+MIN_EXPENSE_ROWS_FOR_REPORTING = 20
+
 
 def _connect() -> duckdb.DuckDBPyConnection:
     if not DUCKDB_PATH.exists():
@@ -80,6 +86,8 @@ def load_data_health() -> dict:
     zero_price_rows = int((sesiones["price_clp"] == 0).sum())
     null_date_rows = int(sesiones["transaction_date"].isna().sum())
 
+    expense_rows = len(gastos) + len(retiros)
+
     return {
         "as_of_date": sesiones["transaction_date"].max(),
         "total_sessions": total_rows,
@@ -88,6 +96,7 @@ def load_data_health() -> dict:
         "null_date_rows": null_date_rows,
         "gastos_rows": len(gastos),
         "retiros_rows": len(retiros),
+        "expense_data_ready": expense_rows >= MIN_EXPENSE_ROWS_FOR_REPORTING,
     }
 
 
